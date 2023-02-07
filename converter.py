@@ -41,3 +41,42 @@ class CMVConverter:
             return self._dict[category]
         except KeyError:
             return def_value
+
+
+# Binary category dummy converter
+class BCDConverter:
+    def __init__(self, categories: Series, base_value: str | None = None, new_name: str | None = None):
+        unique_cats = categories.unique()
+        if len(unique_cats) != 2:
+            raise ValueError(f'Category must contain 2 unique values. Got: {categories.nunique()}')
+        if base_value is not None and base_value not in unique_cats:
+            raise ValueError(f'Base value must be present in series. '
+                             f'Base value: {base_value}. Category values: {unique_cats}')
+        if base_value is None and new_name:
+            raise ValueError('New name param requires base value param')
+
+        dummy_df = pd.get_dummies(categories)
+
+        if not base_value:
+            base_value = dummy_df.columns[0]
+
+        dummy_categories = dummy_df[base_value]
+        if new_name:
+            dummy_categories.name = new_name
+
+        imaginary_value = [cat for cat in unique_cats if cat != base_value][0]
+
+        dummy_dict = {base_value: 1, imaginary_value: 0}
+        self._dummy_dict = dummy_dict
+        self._dummy_cat = dummy_categories
+
+    @property
+    def categories(self):
+        return self._dummy_cat
+
+    @property
+    def dict(self):
+        return self._dummy_dict
+
+    def convert_obj(self, category: object):
+        return self._dummy_dict[str(category)]
