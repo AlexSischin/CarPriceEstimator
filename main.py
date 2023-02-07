@@ -9,7 +9,9 @@ resource_file = 'resources/car_data.csv'
 
 
 def main():
-    df = pd.read_csv(resource_file)
+    car_df = pd.read_csv(resource_file)
+    car_df.dropna(inplace=True)
+    car_df.drop_duplicates(inplace=True)
 
     feature_builder = FeatureBuilder(df)
     fdf = feature_builder.build(df)

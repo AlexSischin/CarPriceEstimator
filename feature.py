@@ -68,21 +68,13 @@ class ZScoreNormalizer:
 
 class FeatureBuilder:
     def __init__(self, car_df: DataFrame):
-        cdf = self._clean_cdf(car_df)
-        self._init_converters(cdf)
-        raw_fdf = self._build_raw_features(cdf)
+        self._init_converters(car_df)
+        raw_fdf = self._build_raw_features(car_df)
         self._init_scalers(raw_fdf)
 
     def build(self, car_df, scale=True):
         raw_fdf = self._build_raw_features(car_df)
         return self._scale(raw_fdf) if scale else raw_fdf
-
-    @staticmethod
-    def _clean_cdf(cdf):
-        cdf = cdf.copy(deep=True)
-        cdf.dropna(inplace=True)
-        cdf.drop_duplicates(inplace=True)
-        return cdf
 
     def _init_converters(self, cdf):
         self._model_mapper = CMVMapper(cdf[COL_MODEL], cdf[COL_PRICE])

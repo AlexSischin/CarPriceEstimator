@@ -9,7 +9,7 @@ https://www.kaggle.com/datasets/nehalbirla/vehicle-dataset-from-cardekho
 
 # Goal
 
-Make a linear regression model that estimates car prices.
+Make a linear regression model that estimates car prices. Without using frameworks and libraries for it.
 
 **Dependent variable**: Price
 
