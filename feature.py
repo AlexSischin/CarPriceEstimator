@@ -1,4 +1,5 @@
 import re
+from functools import reduce
 
 from pandas import DataFrame, Series
 
@@ -52,9 +53,39 @@ T_PRICE = 'price'
 
 VAL_TRANSMISSION_AUTO = 'Automatic'
 VAL_TRANSMISSION_MANUAL = 'Manual'
-PATTERN_ENGINE = re.compile(r'(\d+)\s*cc')
+PATTERN_ENGINE = re.compile(r'^(\d+)\s*cc$')
 PATTERN_POWER = re.compile(r'^([\d.]+)\s*(?:bhp)?\s*@?\s*([\d.]+)\s*(?:rpm)?$', re.RegexFlag.IGNORECASE)
 PATTERN_TORQUE = re.compile(r'^([\d.]+)\s*(?:nm)?\s*@?\s*([\d.]+)\s*(?:rpm)?$', re.RegexFlag.IGNORECASE)
+
+
+def validate_car_df(car_df: DataFrame):
+    duplicates = ~car_df.duplicated(keep='first')
+
+    model = car_df[COL_MODEL].notna()
+    price = car_df[COL_PRICE].notna()
+    year = car_df[COL_YEAR].notna()
+    kilometer = car_df[COL_KILOMETER].notna()
+    fuel_type = car_df[COL_FUEL_TYPE].notna()
+    transmission = car_df[COL_TRANSMISSION].isin([VAL_TRANSMISSION_AUTO, VAL_TRANSMISSION_MANUAL])
+    location = car_df[COL_LOCATION].notna()
+    color = car_df[COL_COLOR].notna()
+    owner = car_df[COL_OWNER].notna()
+    seller_type = car_df[COL_SELLER_TYPE].notna()
+    engine = car_df[COL_ENGINE].str.extract(PATTERN_ENGINE).notna().all(axis=1)
+    max_power = car_df[COL_MAX_POWER].str.extract(PATTERN_POWER).notna().all(axis=1)
+    max_torque = car_df[COL_MAX_TORQUE].str.extract(PATTERN_TORQUE).notna().all(axis=1)
+    drivetrain = car_df[COL_DRIVETRAIN].notna()
+    length = car_df[COL_LENGTH].notna()
+    width = car_df[COL_WIDTH].notna()
+    height = car_df[COL_HEIGHT].notna()
+    seating_capacity = car_df[COL_SEATING_CAPACITY].notna()
+    fuel_capacity = car_df[COL_FUEL_CAPACITY].notna()
+
+    valid_rows = reduce(lambda a, b: a & b,
+                        [duplicates, model, price, year, kilometer, fuel_type, transmission, location, color, owner,
+                         seller_type, engine, max_power, max_torque, drivetrain, length, width, height,
+                         seating_capacity, fuel_capacity])
+    return valid_rows
 
 
 class ZScoreNormalizer:
