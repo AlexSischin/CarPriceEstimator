@@ -71,12 +71,13 @@ class FeatureBuilder:
         self._init_converters(car_df)
         raw_fdf = self._build_raw_features(car_df)
         self._init_scalers(raw_fdf)
+        self.cached_fdf = self._scale(raw_fdf)
 
-    def build(self, car_df, scale=True):
+    def build(self, car_df: DataFrame, scale=True) -> DataFrame:
         raw_fdf = self._build_raw_features(car_df)
         return self._scale(raw_fdf) if scale else raw_fdf
 
-    def _init_converters(self, cdf):
+    def _init_converters(self, cdf) -> None:
         self._model_mapper = CMVMapper(cdf[COL_MODEL], cdf[COL_PRICE])
         self._fuel_type_mapper = CMVMapper(cdf[COL_FUEL_TYPE], cdf[COL_PRICE])
         self._transmission_mapper = BCDMapper(VAL_TRANSMISSION_AUTO, VAL_TRANSMISSION_MANUAL)
@@ -87,7 +88,7 @@ class FeatureBuilder:
         self._drivetrain_mapper = CMVMapper(cdf[COL_DRIVETRAIN], cdf[COL_PRICE])
         self._mean_height = cdf[COL_HEIGHT].mean()
 
-    def _build_raw_features(self, car_df):
+    def _build_raw_features(self, car_df) -> DataFrame:
         fdf = DataFrame()
         fdf[F_MODEL_M_PRICE] = self._model_mapper.map(car_df[COL_MODEL])
         fdf[F_YEAR] = car_df[COL_YEAR]
@@ -116,7 +117,7 @@ class FeatureBuilder:
     def _init_scalers(self, raw_fdf):
         self._scalers = {column: ZScoreNormalizer(raw_fdf[column]) for column in raw_fdf}
 
-    def _scale(self, fdf):
+    def _scale(self, fdf) -> DataFrame:
         for column in fdf:
             fdf[column] = self._scalers[column].scale(fdf[column])
         return fdf
