@@ -58,6 +58,7 @@ PATTERN_POWER = re.compile(r'^([\d.]+)\s*(?:bhp)?\s*@?\s*([\d.]+)\s*(?:rpm)?$', 
 PATTERN_TORQUE = re.compile(r'^([\d.]+)\s*(?:nm)?\s*@?\s*([\d.]+)\s*(?:rpm)?$', re.RegexFlag.IGNORECASE)
 
 
+# Validate raw data to use it for deriving features in future
 def validate_car_df(car_df: DataFrame):
     duplicates = ~car_df.duplicated(keep='first')
 
@@ -104,6 +105,7 @@ class FeatureBuilder:
         self._init_scalers(raw_fdf)
         self.cached_fdf = self._scale(raw_fdf)
 
+    # Create scaled features frame from raw data
     def build(self, car_df: DataFrame, scale=True) -> DataFrame:
         raw_fdf = self._build_raw_features(car_df)
         return self._scale(raw_fdf) if scale else raw_fdf
