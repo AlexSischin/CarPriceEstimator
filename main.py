@@ -7,7 +7,7 @@ from pandas import DataFrame
 from pandas.core.dtypes.common import is_numeric_dtype
 
 from feature import FeatureBuilder, COL_PRICE, validate_car_df, COL_MODEL
-from model import LinearRegressor
+from model import LinearRegressor, LearningHistPoint
 
 log = logging.getLogger(__name__)
 
@@ -78,6 +78,20 @@ def _plot_tests(test_car_df: DataFrame, estimates: np.ndarray):
             ax.axes.xaxis.set_ticklabels([])
 
 
+def _plot_dj_dw(learning_hist: list[LearningHistPoint]):
+    n = learning_hist[0].w.shape[0]
+    plot_rows = int(np.floor(np.sqrt(n)))
+    plot_columns = int(np.ceil(n / plot_rows))
+    fig, axes = plt.subplots(plot_rows, plot_columns)
+
+    dj_dw = np.array([hp.dj_dw for hp in learning_hist]).T
+    i_num = len(learning_hist)
+    for i in range(n):
+        plot_row, plot_column = i // plot_columns, i % plot_columns
+        ax = axes[plot_row, plot_column]
+        ax.plot(np.arange(1, i_num + 1), dj_dw[i])
+
+
 def _main():
     train_car_df, test_car_df = load_data('resources/car_data.csv', test_examples=50, filter_out_unknown_models=True)
 
@@ -92,7 +106,7 @@ def _main():
     test_y = test_car_df[COL_PRICE].to_numpy(dtype=float)
 
     w, b = initialize_w_and_b(train_x)
-    iterations = 300
+    iterations = 1000
     learning_rate = 1e-1
     regularization_param = 0
     regressor = LinearRegressor(w, b)
@@ -112,6 +126,7 @@ def _main():
     log.info(f'Average relative error: {float(mean_relative_error):.2f} +- {float(std_error):.2f}')
 
     _plot_costs(cost_hist)
+    _plot_dj_dw(learning_hist)
     _plot_tests(test_car_df, test_y_estimates)
     plt.subplots_adjust(left=0.04, right=0.97, top=0.95, bottom=0.05, hspace=0.5)
     plt.show()
