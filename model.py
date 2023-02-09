@@ -78,7 +78,7 @@ class LinearRegressor:
     # Returns:
     #   float - cost of model for x.
     def cost(self, x: np.ndarray, y: np.ndarray, lamb: float) -> float:
-        return np.mean(self._loss(x, y)) + (lamb / 2 * x.shape[0]) * np.sum(self._w ** 2)
+        return np.mean(self._loss(x, y)) + (lamb / (2 * x.shape[0])) * np.sum(self._w ** 2)
 
     def _loss(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         return (self.predict(x) - y) ** 2 / 2
@@ -102,5 +102,6 @@ class LinearRegressor:
             dj_dw, dj_db = self._gradient(x, y, lamb)
             self._w -= a * dj_dw
             self._b -= a * dj_db
-            hist.append(LearningHistPoint(cost=self.cost(x, y, lamb), dj_dw=dj_dw, dj_db=dj_db, w=self._w, b=self._b))
+            hist.append(LearningHistPoint(cost=self.cost(x, y, lamb), dj_dw=dj_dw, dj_db=dj_db, w=np.copy(self._w),
+                                          b=self._b))
         return hist
