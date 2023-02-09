@@ -94,12 +94,13 @@ def _main():
     w, b = initialize_w_and_b(train_x)
     iterations = 300
     learning_rate = 1e-1
+    regularization_param = 0
     regressor = LinearRegressor(w, b)
 
-    initial_cost = regressor.cost(train_x, train_y)
+    initial_cost = regressor.cost(train_x, train_y, regularization_param)
     log.info(f'Initial cost: {initial_cost:g}')
 
-    learning_hist = regressor.fit(train_x, train_y, learning_rate, iterations, debug=True)
+    learning_hist = regressor.fit(train_x, train_y, learning_rate, regularization_param, iterations, debug=True)
     cost_hist = [hp.cost for hp in learning_hist]
 
     log.info(f'Convergence cost: {cost_hist[-1]:g}')
