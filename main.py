@@ -103,6 +103,8 @@ def _main():
     cost_hist = [hp.cost for hp in learning_hist]
 
     log.info(f'Convergence cost: {cost_hist[-1]:g}')
+    log.info(f'Weights: {np.array2string(regressor.w, precision=0)}')
+    log.info(f'Bias: {np.array2string(regressor.b, precision=0)}')
 
     test_y_estimates = regressor.predict(test_x)
     mean_relative_error, std_error = calc_mean_relative_error(test_y_estimates, test_y)
