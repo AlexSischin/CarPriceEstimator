@@ -31,6 +31,14 @@ class LinearRegressor:
         self._w = w
         self._b = b
 
+    @property
+    def w(self):
+        return self._w
+
+    @property
+    def b(self):
+        return self._b
+
     # Parameters:
     #   x - 2D array with shape (m, n), where m - number of training examples, n - number of features
     #   y - 1D array of targets with shape of m
